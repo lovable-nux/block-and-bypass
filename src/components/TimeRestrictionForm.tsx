@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Card, 
@@ -17,8 +16,8 @@ import { Check, ChevronsUpDown, X, Plus, Trash2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { Checkbox } from "@/components/ui/checkbox";
 import { v4 as uuidv4 } from 'uuid';
+import countryTimezone from 'country-timezone';
 
 interface TimeRestrictionFormProps {
   restriction?: TimeRestriction;
@@ -59,6 +58,34 @@ const TimeRestrictionForm = ({
     { value: "sun", label: "Sunday" },
   ];
   
+  // Effect to update timezone based on country selection
+  useEffect(() => {
+    if (formData.country) {
+      // Get timezones for the selected country
+      const countryTzs = countryTimezone.getTimezones(formData.country);
+      
+      // If we have timezones for this country, use the first one
+      if (countryTzs && countryTzs.length > 0) {
+        // Check if the timezone is in our supported list
+        const foundTimezone = timezones.find(tz => tz.code === countryTzs[0]);
+        
+        if (foundTimezone) {
+          setFormData(prev => ({ ...prev, timezone: foundTimezone.code }));
+        } else {
+          // If not in our supported list, try to find a supported timezone for this region
+          // For example, if country timezone is Europe/Moscow but we only support Europe/Amsterdam
+          const region = countryTzs[0].split('/')[0];
+          const regionTimezone = timezones.find(tz => tz.code.startsWith(`${region}/`));
+          
+          if (regionTimezone) {
+            setFormData(prev => ({ ...prev, timezone: regionTimezone.code }));
+          }
+          // If no match, keep the current timezone
+        }
+      }
+    }
+  }, [formData.country]);
+  
   const toggleDay = (day: "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun") => {
     setFormData(prev => {
       if (prev.days.includes(day)) {
@@ -70,6 +97,12 @@ const TimeRestrictionForm = ({
   };
   
   const handleSave = () => {
+    // Validate that a country is selected
+    if (!formData.country) {
+      alert("Please select a country before saving");
+      return;
+    }
+    
     onSave(formData);
   };
   
@@ -108,6 +141,64 @@ const TimeRestrictionForm = ({
         </div>
         
         <div className="space-y-2">
+          <Label>Country</Label>
+          <Popover open={countryOpen} onOpenChange={setCountryOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={countryOpen}
+                className="w-full justify-between"
+              >
+                {selectedCountry ? selectedCountry.name : "Select a country..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[400px] p-0 z-50">
+              <Command>
+                <CommandInput placeholder="Search country..." />
+                <CommandEmpty>No country found.</CommandEmpty>
+                <div className="max-h-[300px] overflow-y-auto">
+                  <CommandGroup>
+                    {countries.map((country) => (
+                      <CommandItem
+                        key={country.code}
+                        value={country.name}
+                        onSelect={() => {
+                          setFormData({ ...formData, country: country.code });
+                          setCountryOpen(false);
+                        }}
+                        className="flex items-center"
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            formData.country === country.code ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {country.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </div>
+              </Command>
+            </PopoverContent>
+          </Popover>
+          
+          {selectedCountry && (
+            <div className="flex items-center bg-accent text-accent-foreground px-3 py-1.5 rounded-md text-sm w-fit mt-2">
+              {selectedCountry.name}
+              <button
+                onClick={() => setFormData(prev => ({ ...prev, country: "" }))}
+                className="ml-2 text-accent-foreground/70 hover:text-accent-foreground"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+        </div>
+        
+        <div className="space-y-2">
           <Label>Timezone</Label>
           <Popover open={timezonesOpen} onOpenChange={setTimezonesOpen}>
             <PopoverTrigger asChild>
@@ -121,7 +212,7 @@ const TimeRestrictionForm = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0 max-h-[300px] overflow-y-auto">
+            <PopoverContent className="w-full p-0 max-h-[300px] overflow-y-auto z-50">
               <Command>
                 <CommandInput placeholder="Search timezone..." />
                 <CommandEmpty>No timezone found.</CommandEmpty>
@@ -169,64 +260,6 @@ const TimeRestrictionForm = ({
               </div>
             ))}
           </div>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Country</Label>
-          <Popover open={countryOpen} onOpenChange={setCountryOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={countryOpen}
-                className="w-full justify-between"
-              >
-                {selectedCountry ? selectedCountry.name : "Select a country..."}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0">
-              <Command>
-                <CommandInput placeholder="Search country..." />
-                <CommandEmpty>No country found.</CommandEmpty>
-                <div className="max-h-[300px] overflow-y-auto">
-                  <CommandGroup>
-                    {countries.map((country) => (
-                      <CommandItem
-                        key={country.code}
-                        value={country.name}
-                        onSelect={() => {
-                          setFormData({ ...formData, country: country.code });
-                          setCountryOpen(false);
-                        }}
-                        className="flex items-center"
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            formData.country === country.code ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {country.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </div>
-              </Command>
-            </PopoverContent>
-          </Popover>
-          
-          {selectedCountry && (
-            <div className="flex items-center bg-accent text-accent-foreground px-3 py-1.5 rounded-md text-sm w-fit mt-2">
-              {selectedCountry.name}
-              <button
-                onClick={() => setFormData(prev => ({ ...prev, country: "" }))}
-                className="ml-2 text-accent-foreground/70 hover:text-accent-foreground"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          )}
         </div>
         
         <div className="flex items-center space-x-2">
