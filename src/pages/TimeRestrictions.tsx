@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { 
   Card, 
@@ -244,7 +245,7 @@ const TimeRestrictions = () => {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Note about time-based restrictions</AlertTitle>
                 <AlertDescription>
-                  Time-based restrictions work alongside country blocking. Users will be denied access based on their location and the current time in the specified timezone.
+                  If both Country Blocking and Time Restrictions are enabled for a country, Time Restrictions will override Country Blocking. During the specified restriction period, users will be geo-blocked. Outside of this period, registration and login will be allowed, even if the country is normally blocked.
                 </AlertDescription>
               </Alert>
               
