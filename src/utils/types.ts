@@ -18,10 +18,7 @@ export interface TimeRestriction {
 export interface AffiliateException {
   id: string;
   name: string;
-  utmSource?: string;
-  utmMedium?: string;
-  utmCampaign?: string;
-  referralCode?: string;
+  affiliateId: string;
   bypassRestrictions: {
     geoBlocking: boolean;
     timeRestrictions: boolean;

@@ -143,19 +143,6 @@ const AffiliateExceptions = () => {
     );
   }
   
-  const getTrackingParameters = (affiliate: AffiliateException) => {
-    const params = [];
-    
-    if (affiliate.utmSource) params.push(`utm_source=${affiliate.utmSource}`);
-    if (affiliate.utmMedium) params.push(`utm_medium=${affiliate.utmMedium}`);
-    if (affiliate.utmCampaign) params.push(`utm_campaign=${affiliate.utmCampaign}`);
-    if (affiliate.referralCode) params.push(`ref=${affiliate.referralCode}`);
-    
-    if (params.length === 0) return "No tracking parameters defined";
-    
-    return params.join(" & ");
-  };
-  
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar />
@@ -178,6 +165,7 @@ const AffiliateExceptions = () => {
                 setActiveAffiliate({
                   id: uuidv4(),
                   name: "",
+                  affiliateId: "",
                   bypassRestrictions: {
                     geoBlocking: true,
                     timeRestrictions: true
@@ -216,6 +204,7 @@ const AffiliateExceptions = () => {
                       setActiveAffiliate({
                         id: uuidv4(),
                         name: "",
+                        affiliateId: "",
                         bypassRestrictions: {
                           geoBlocking: true,
                           timeRestrictions: true
@@ -234,7 +223,7 @@ const AffiliateExceptions = () => {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>How affiliate exceptions work</AlertTitle>
                     <AlertDescription>
-                      Users accessing your site through these affiliate links will be allowed to register and log in even from blocked countries or during restricted times. This helps ensure your affiliate campaigns run smoothly regardless of geo-blocking rules.
+                      Users accessing your site through affiliate links with the specified IDs will be allowed to register and log in even from blocked countries or during restricted times. This helps ensure your affiliate campaigns run smoothly regardless of geo-blocking rules.
                     </AlertDescription>
                   </Alert>
                   
@@ -254,7 +243,7 @@ const AffiliateExceptions = () => {
                               </Badge>
                             </CardTitle>
                             <CardDescription>
-                              {getTrackingParameters(affiliate)}
+                              Affiliate ID: <span className="font-mono">{affiliate.affiliateId}</span>
                             </CardDescription>
                           </div>
                           <div className="flex items-center space-x-2">
@@ -301,7 +290,7 @@ const AffiliateExceptions = () => {
                         
                         <div className="mt-4 bg-muted/50 p-3 rounded-md text-sm">
                           <p className="text-muted-foreground">
-                            Traffic with {getTrackingParameters(affiliate)} will be allowed to access your site 
+                            Traffic with affiliate ID <span className="font-mono">{affiliate.affiliateId}</span> will be allowed to access your site 
                             {affiliate.bypassRestrictions.geoBlocking && affiliate.bypassRestrictions.timeRestrictions 
                               ? " regardless of their location or time of day." 
                               : affiliate.bypassRestrictions.geoBlocking 

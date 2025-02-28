@@ -34,10 +34,7 @@ const AffiliateForm = ({
   const [formData, setFormData] = useState<AffiliateException>({
     id: affiliate?.id || uuidv4(),
     name: affiliate?.name || "",
-    utmSource: affiliate?.utmSource || "",
-    utmMedium: affiliate?.utmMedium || "",
-    utmCampaign: affiliate?.utmCampaign || "",
-    referralCode: affiliate?.referralCode || "",
+    affiliateId: affiliate?.affiliateId || "",
     bypassRestrictions: affiliate?.bypassRestrictions || {
       geoBlocking: true,
       timeRestrictions: true
@@ -84,56 +81,20 @@ const AffiliateForm = ({
           />
         </div>
         
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="utmSource">UTM Source</Label>
-            <Input
-              id="utmSource"
-              name="utmSource"
-              value={formData.utmSource}
-              onChange={handleChange}
-              placeholder="e.g. partner"
-              className="w-full"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="utmMedium">UTM Medium</Label>
-            <Input
-              id="utmMedium"
-              name="utmMedium"
-              value={formData.utmMedium}
-              onChange={handleChange}
-              placeholder="e.g. affiliate"
-              className="w-full"
-            />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label htmlFor="utmCampaign">UTM Campaign</Label>
-            <Input
-              id="utmCampaign"
-              name="utmCampaign"
-              value={formData.utmCampaign}
-              onChange={handleChange}
-              placeholder="e.g. summer2023"
-              className="w-full"
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="referralCode">Referral Code</Label>
-            <Input
-              id="referralCode"
-              name="referralCode"
-              value={formData.referralCode}
-              onChange={handleChange}
-              placeholder="e.g. PARTNER10"
-              className="w-full"
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="affiliateId">Affiliate ID</Label>
+          <Input
+            id="affiliateId"
+            name="affiliateId"
+            value={formData.affiliateId}
+            onChange={handleChange}
+            placeholder="e.g. PARTNER123"
+            className="w-full"
+            required
+          />
+          <p className="text-sm text-muted-foreground mt-1">
+            This ID will be used in URLs to identify traffic from this affiliate
+          </p>
         </div>
         
         <div className="space-y-3 pt-2">

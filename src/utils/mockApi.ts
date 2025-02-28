@@ -20,8 +20,7 @@ const initialSettings: GeoBlockingSettings = {
     {
       id: "1",
       name: "Premium Affiliate",
-      utmSource: "premium",
-      utmMedium: "partner",
+      affiliateId: "PREMIUM001",
       bypassRestrictions: {
         geoBlocking: true,
         timeRestrictions: true
