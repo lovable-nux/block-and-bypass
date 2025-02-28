@@ -35,9 +35,10 @@ const TimeRestrictionForm = ({
 }: TimeRestrictionFormProps) => {
   const isNew = !restriction;
   
+  // Initialize with a single country (either from restriction or empty)
   const [formData, setFormData] = useState<TimeRestriction>({
     id: restriction?.id || uuidv4(),
-    countries: restriction?.countries || [],
+    country: restriction?.country || "",
     startTime: restriction?.startTime || "09:00",
     endTime: restriction?.endTime || "18:00",
     days: restriction?.days || ["mon", "tue", "wed", "thu", "fri"],
@@ -45,7 +46,7 @@ const TimeRestrictionForm = ({
     enabled: restriction?.enabled !== undefined ? restriction.enabled : true
   });
   
-  const [countriesOpen, setCountriesOpen] = useState(false);
+  const [countryOpen, setCountryOpen] = useState(false);
   const [timezonesOpen, setTimezonesOpen] = useState(false);
   
   const dayOptions = [
@@ -72,9 +73,8 @@ const TimeRestrictionForm = ({
     onSave(formData);
   };
   
-  const selectedCountries = countries.filter(country => 
-    formData.countries.includes(country.code)
-  );
+  // Find the country object for the selected country code
+  const selectedCountry = formData.country ? countries.find(c => c.code === formData.country) : null;
   
   return (
     <Card className="w-full animate-fade-in">
@@ -172,18 +172,16 @@ const TimeRestrictionForm = ({
         </div>
         
         <div className="space-y-2">
-          <Label>Countries</Label>
-          <Popover open={countriesOpen} onOpenChange={setCountriesOpen}>
+          <Label>Country</Label>
+          <Popover open={countryOpen} onOpenChange={setCountryOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
-                aria-expanded={countriesOpen}
+                aria-expanded={countryOpen}
                 className="w-full justify-between"
               >
-                {selectedCountries.length > 0 
-                  ? `${selectedCountries.length} countries selected` 
-                  : "Select countries..."}
+                {selectedCountry ? selectedCountry.name : "Select a country..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
@@ -198,18 +196,16 @@ const TimeRestrictionForm = ({
                         key={country.code}
                         value={country.name}
                         onSelect={() => {
-                          setFormData(prev => {
-                            const newCountries = prev.countries.includes(country.code)
-                              ? prev.countries.filter(c => c !== country.code)
-                              : [...prev.countries, country.code];
-                            return { ...prev, countries: newCountries };
-                          });
+                          setFormData({ ...formData, country: country.code });
+                          setCountryOpen(false);
                         }}
                         className="flex items-center"
                       >
-                        <Checkbox 
-                          checked={formData.countries.includes(country.code)}
-                          className="mr-2 h-4 w-4"
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            formData.country === country.code ? "opacity-100" : "opacity-0"
+                          )}
                         />
                         {country.name}
                       </CommandItem>
@@ -220,30 +216,15 @@ const TimeRestrictionForm = ({
             </PopoverContent>
           </Popover>
           
-          {selectedCountries.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {selectedCountries.slice(0, 5).map((country) => (
-                <div
-                  key={country.code}
-                  className="flex items-center gap-1 bg-accent text-accent-foreground px-2 py-1 rounded-md text-xs"
-                >
-                  {country.name}
-                  <button
-                    onClick={() => setFormData(prev => ({
-                      ...prev,
-                      countries: prev.countries.filter(c => c !== country.code)
-                    }))}
-                    className="text-accent-foreground/70 hover:text-accent-foreground"
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-              ))}
-              {selectedCountries.length > 5 && (
-                <div className="bg-accent text-accent-foreground px-2 py-1 rounded-md text-xs">
-                  +{selectedCountries.length - 5} more
-                </div>
-              )}
+          {selectedCountry && (
+            <div className="flex items-center bg-accent text-accent-foreground px-3 py-1.5 rounded-md text-sm w-fit mt-2">
+              {selectedCountry.name}
+              <button
+                onClick={() => setFormData(prev => ({ ...prev, country: "" }))}
+                className="ml-2 text-accent-foreground/70 hover:text-accent-foreground"
+              >
+                <X size={14} />
+              </button>
             </div>
           )}
         </div>

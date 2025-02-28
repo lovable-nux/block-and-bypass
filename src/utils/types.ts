@@ -7,7 +7,7 @@ export interface Country {
 
 export interface TimeRestriction {
   id: string;
-  countries: string[];
+  country: string;
   startTime: string; // format: "HH:MM"
   endTime: string; // format: "HH:MM"
   days: ("mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun")[];

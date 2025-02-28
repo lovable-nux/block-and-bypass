@@ -168,19 +168,11 @@ const TimeRestrictions = () => {
     return days.map(d => dayMap[d]).join(", ");
   };
   
-  const getCountryNames = (countryCodes: string[]) => {
-    if (countryCodes.length === 0) return "No countries selected";
+  const getCountryName = (countryCode: string) => {
+    if (!countryCode) return "No country selected";
     
-    const names = countryCodes.map(code => {
-      const country = countries.find(c => c.code === code);
-      return country ? country.name : code;
-    });
-    
-    if (names.length > 3) {
-      return `${names.slice(0, 3).join(", ")} +${names.length - 3} more`;
-    }
-    
-    return names.join(", ");
+    const country = countries.find(c => c.code === countryCode);
+    return country ? country.name : countryCode;
   };
   
   return (
@@ -204,7 +196,7 @@ const TimeRestrictions = () => {
                 setIsAdding(true);
                 setActiveRestriction({
                   id: uuidv4(),
-                  countries: [],
+                  country: "",
                   startTime: "09:00",
                   endTime: "18:00",
                   days: ["mon", "tue", "wed", "thu", "fri"],
@@ -242,7 +234,7 @@ const TimeRestrictions = () => {
                       setIsAdding(true);
                       setActiveRestriction({
                         id: uuidv4(),
-                        countries: [],
+                        country: "",
                         startTime: "09:00",
                         endTime: "18:00",
                         days: ["mon", "tue", "wed", "thu", "fri"],
@@ -261,7 +253,7 @@ const TimeRestrictions = () => {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Note about time-based restrictions</AlertTitle>
                     <AlertDescription>
-                      Time-based restrictions work alongside country blocking. Users will be denied access based on both their location and the current time in the specified timezone.
+                      Time-based restrictions work alongside country blocking. Users will be denied access based on their location and the current time in the specified timezone.
                     </AlertDescription>
                   </Alert>
                   
@@ -305,12 +297,12 @@ const TimeRestrictions = () => {
                         <div className="flex items-center mt-2">
                           <Globe className="h-4 w-4 text-muted-foreground mr-2" />
                           <span className="text-sm text-muted-foreground">
-                            Countries: {getCountryNames(restriction.countries)}
+                            Country: {getCountryName(restriction.country)}
                           </span>
                         </div>
                         <div className="mt-4 bg-muted/50 p-3 rounded-md text-sm">
                           <p className="text-muted-foreground">
-                            Access from {getCountryNames(restriction.countries)} will be blocked between {restriction.startTime} - {restriction.endTime} ({restriction.timezone}) on {formatDays(restriction.days)}.
+                            Access from {getCountryName(restriction.country)} will be blocked between {restriction.startTime} - {restriction.endTime} ({restriction.timezone}) on {formatDays(restriction.days)}.
                           </p>
                         </div>
                       </CardContent>

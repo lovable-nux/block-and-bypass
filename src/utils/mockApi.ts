@@ -8,7 +8,7 @@ const initialSettings: GeoBlockingSettings = {
   timeRestrictions: [
     {
       id: "1",
-      countries: ["RU", "BY"],
+      country: "RU",
       startTime: "09:00",
       endTime: "18:00",
       days: ["mon", "tue", "wed", "thu", "fri"],
@@ -43,7 +43,29 @@ const getStoredSettings = (): GeoBlockingSettings => {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored) {
     try {
-      return JSON.parse(stored);
+      const parsedSettings = JSON.parse(stored);
+      
+      // Handle migration from countries array to single country
+      if (parsedSettings.timeRestrictions) {
+        parsedSettings.timeRestrictions = parsedSettings.timeRestrictions.map((restriction: any) => {
+          if (Array.isArray(restriction.countries) && restriction.countries.length > 0) {
+            return {
+              ...restriction,
+              country: restriction.countries[0],
+              countries: undefined
+            };
+          } else if (Array.isArray(restriction.countries) && restriction.countries.length === 0) {
+            return {
+              ...restriction,
+              country: "",
+              countries: undefined
+            };
+          }
+          return restriction;
+        });
+      }
+      
+      return parsedSettings;
     } catch (e) {
       console.error("Failed to parse stored settings", e);
     }
