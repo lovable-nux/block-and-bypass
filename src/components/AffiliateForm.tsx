@@ -170,7 +170,7 @@ const AffiliateForm = ({
           <Switch
             id="enabled"
             checked={formData.enabled}
-            onCheckedChange={(checked) => setFormData({ ...prev => ({ ...prev, enabled: checked }))}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enabled: checked }))}
           />
           <Label htmlFor="enabled">Enable this exception</Label>
         </div>
