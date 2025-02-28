@@ -64,6 +64,11 @@ const getStoredSettings = (): GeoBlockingSettings => {
           return restriction;
         });
       }
+
+      // Make sure affiliateExceptions is initialized
+      if (!parsedSettings.affiliateExceptions) {
+        parsedSettings.affiliateExceptions = initialSettings.affiliateExceptions;
+      }
       
       return parsedSettings;
     } catch (e) {

@@ -144,7 +144,7 @@ const AffiliateExceptions = () => {
   }
 
   const formatIdentifiers = (identifiers: AffiliateException['identifiers']) => {
-    if (identifiers.length === 0) return "No identifiers";
+    if (!identifiers || identifiers.length === 0) return "No identifiers";
     
     if (identifiers.length === 1) {
       return identifiers[0].value;
@@ -200,7 +200,7 @@ const AffiliateExceptions = () => {
             />
           ) : (
             <>
-              {settings?.affiliateExceptions.length === 0 ? (
+              {!settings?.affiliateExceptions || settings.affiliateExceptions.length === 0 ? (
                 <Card className="mb-6">
                   <CardContent className="flex flex-col items-center justify-center py-12">
                     <Users className="h-12 w-12 text-muted-foreground mb-4" />
@@ -235,7 +235,7 @@ const AffiliateExceptions = () => {
                     </AlertDescription>
                   </Alert>
                   
-                  {settings?.affiliateExceptions.map((affiliate) => (
+                  {settings.affiliateExceptions.map((affiliate) => (
                     <Card key={affiliate.id} className="card-hover overflow-hidden">
                       <CardHeader className="pb-3">
                         <div className="flex items-start justify-between">
@@ -250,7 +250,7 @@ const AffiliateExceptions = () => {
                               </Badge>
                             </CardTitle>
                             <CardDescription>
-                              {affiliate.identifiers.map((id, index) => (
+                              {affiliate.identifiers && affiliate.identifiers.map((id, index) => (
                                 <span key={index} className="mr-1">
                                   <Badge variant="outline" className="mr-1 font-mono">
                                     {id.value}
