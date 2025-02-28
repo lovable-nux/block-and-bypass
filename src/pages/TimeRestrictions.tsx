@@ -7,8 +7,6 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
 import { fetchSettings, updateTimeRestrictions } from "@/utils/mockApi";
 import { GeoBlockingSettings, TimeRestriction } from "@/utils/types";
 import { useToast } from "@/hooks/use-toast";
@@ -134,7 +132,7 @@ const TimeRestrictions = () => {
   
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center">
           <div className="h-10 w-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           <p className="mt-4 text-lg">Loading time restriction settings...</p>
@@ -176,144 +174,135 @@ const TimeRestrictions = () => {
   };
   
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
-      
-      <div className="flex-1 pl-64">
-        <Header />
+    <div className="animate-fade-in">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <p className="text-muted-foreground">
+            Manage access restrictions based on time and days of the week
+          </p>
+        </div>
         
-        <main className="container px-4 py-6 pt-20 animate-fade-in">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight">Time Restrictions</h1>
-              <p className="text-muted-foreground mt-1">
-                Manage access restrictions based on time and days of the week
-              </p>
-            </div>
-            
-            {!activeRestriction && (
-              <Button onClick={() => {
-                setIsAdding(true);
-                setActiveRestriction({
-                  id: uuidv4(),
-                  country: "",
-                  startTime: "09:00",
-                  endTime: "18:00",
-                  days: ["mon", "tue", "wed", "thu", "fri"],
-                  timezone: "Europe/Amsterdam",
-                  enabled: true
-                });
-              }}>
-                <Plus className="mr-2 h-4 w-4" />
-                Add Restriction
-              </Button>
-            )}
-          </div>
-          
-          {activeRestriction ? (
-            <TimeRestrictionForm
-              restriction={activeRestriction}
-              onSave={handleSaveRestriction}
-              onCancel={() => {
-                setActiveRestriction(null);
-                setIsAdding(false);
-              }}
-              onDelete={!isAdding ? () => handleDeleteRestriction(activeRestriction.id) : undefined}
-            />
+        {!activeRestriction && (
+          <Button onClick={() => {
+            setIsAdding(true);
+            setActiveRestriction({
+              id: uuidv4(),
+              country: "",
+              startTime: "09:00",
+              endTime: "18:00",
+              days: ["mon", "tue", "wed", "thu", "fri"],
+              timezone: "Europe/Amsterdam",
+              enabled: true
+            });
+          }}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Restriction
+          </Button>
+        )}
+      </div>
+      
+      {activeRestriction ? (
+        <TimeRestrictionForm
+          restriction={activeRestriction}
+          onSave={handleSaveRestriction}
+          onCancel={() => {
+            setActiveRestriction(null);
+            setIsAdding(false);
+          }}
+          onDelete={!isAdding ? () => handleDeleteRestriction(activeRestriction.id) : undefined}
+        />
+      ) : (
+        <>
+          {settings?.timeRestrictions.length === 0 ? (
+            <Card className="mb-6">
+              <CardContent className="flex flex-col items-center justify-center py-12">
+                <Clock className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-xl font-medium mb-2">No Time Restrictions</h3>
+                <p className="text-muted-foreground text-center max-w-md mb-6">
+                  You have not created any time-based restrictions yet. Create a restriction to block access during specific times.
+                </p>
+                <Button onClick={() => {
+                  setIsAdding(true);
+                  setActiveRestriction({
+                    id: uuidv4(),
+                    country: "",
+                    startTime: "09:00",
+                    endTime: "18:00",
+                    days: ["mon", "tue", "wed", "thu", "fri"],
+                    timezone: "Europe/Amsterdam",
+                    enabled: true
+                  });
+                }}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Your First Restriction
+                </Button>
+              </CardContent>
+            </Card>
           ) : (
-            <>
-              {settings?.timeRestrictions.length === 0 ? (
-                <Card className="mb-6">
-                  <CardContent className="flex flex-col items-center justify-center py-12">
-                    <Clock className="h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 className="text-xl font-medium mb-2">No Time Restrictions</h3>
-                    <p className="text-muted-foreground text-center max-w-md mb-6">
-                      You have not created any time-based restrictions yet. Create a restriction to block access during specific times.
-                    </p>
-                    <Button onClick={() => {
-                      setIsAdding(true);
-                      setActiveRestriction({
-                        id: uuidv4(),
-                        country: "",
-                        startTime: "09:00",
-                        endTime: "18:00",
-                        days: ["mon", "tue", "wed", "thu", "fri"],
-                        timezone: "Europe/Amsterdam",
-                        enabled: true
-                      });
-                    }}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Your First Restriction
-                    </Button>
+            <div className="grid gap-6">
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Note about time-based restrictions</AlertTitle>
+                <AlertDescription>
+                  Time-based restrictions work alongside country blocking. Users will be denied access based on their location and the current time in the specified timezone.
+                </AlertDescription>
+              </Alert>
+              
+              {settings?.timeRestrictions.map((restriction) => (
+                <Card key={restriction.id} className="card-hover overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <CardTitle className="flex items-center text-lg">
+                          <Clock className="mr-2 h-5 w-5 text-primary" />
+                          {restriction.startTime} - {restriction.endTime}
+                          <Badge 
+                            variant={restriction.enabled ? "default" : "outline"} 
+                            className="ml-3"
+                          >
+                            {restriction.enabled ? "Active" : "Inactive"}
+                          </Badge>
+                        </CardTitle>
+                        <CardDescription>
+                          {formatDays(restriction.days)} • {restriction.timezone}
+                        </CardDescription>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          checked={restriction.enabled}
+                          onCheckedChange={(checked) => toggleRestrictionStatus(restriction.id, checked)}
+                          aria-label="Toggle restriction"
+                        />
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setActiveRestriction(restriction)}
+                        >
+                          <Settings className="h-4 w-4 mr-1" />
+                          Edit
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="flex items-center mt-2">
+                      <Globe className="h-4 w-4 text-muted-foreground mr-2" />
+                      <span className="text-sm text-muted-foreground">
+                        Country: {getCountryName(restriction.country)}
+                      </span>
+                    </div>
+                    <div className="mt-4 bg-muted/50 p-3 rounded-md text-sm">
+                      <p className="text-muted-foreground">
+                        Access from {getCountryName(restriction.country)} will be blocked between {restriction.startTime} - {restriction.endTime} ({restriction.timezone}) on {formatDays(restriction.days)}.
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
-              ) : (
-                <div className="grid gap-6">
-                  <Alert>
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Note about time-based restrictions</AlertTitle>
-                    <AlertDescription>
-                      Time-based restrictions work alongside country blocking. Users will be denied access based on their location and the current time in the specified timezone.
-                    </AlertDescription>
-                  </Alert>
-                  
-                  {settings?.timeRestrictions.map((restriction) => (
-                    <Card key={restriction.id} className="card-hover overflow-hidden">
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div className="space-y-1">
-                            <CardTitle className="flex items-center text-lg">
-                              <Clock className="mr-2 h-5 w-5 text-primary" />
-                              {restriction.startTime} - {restriction.endTime}
-                              <Badge 
-                                variant={restriction.enabled ? "default" : "outline"} 
-                                className="ml-3"
-                              >
-                                {restriction.enabled ? "Active" : "Inactive"}
-                              </Badge>
-                            </CardTitle>
-                            <CardDescription>
-                              {formatDays(restriction.days)} • {restriction.timezone}
-                            </CardDescription>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <Switch
-                              checked={restriction.enabled}
-                              onCheckedChange={(checked) => toggleRestrictionStatus(restriction.id, checked)}
-                              aria-label="Toggle restriction"
-                            />
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => setActiveRestriction(restriction)}
-                            >
-                              <Settings className="h-4 w-4 mr-1" />
-                              Edit
-                            </Button>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="flex items-center mt-2">
-                          <Globe className="h-4 w-4 text-muted-foreground mr-2" />
-                          <span className="text-sm text-muted-foreground">
-                            Country: {getCountryName(restriction.country)}
-                          </span>
-                        </div>
-                        <div className="mt-4 bg-muted/50 p-3 rounded-md text-sm">
-                          <p className="text-muted-foreground">
-                            Access from {getCountryName(restriction.country)} will be blocked between {restriction.startTime} - {restriction.endTime} ({restriction.timezone}) on {formatDays(restriction.days)}.
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </>
+              ))}
+            </div>
           )}
-        </main>
-      </div>
+        </>
+      )}
     </div>
   );
 };
