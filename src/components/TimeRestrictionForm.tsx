@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { 
   Card, 
@@ -14,7 +15,14 @@ import { TimeRestriction } from "@/utils/types";
 import { countries, timezones } from "@/utils/countries";
 import { Check, ChevronsUpDown, X, Plus, Trash2 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { 
+  Command, 
+  CommandEmpty, 
+  CommandGroup, 
+  CommandInput, 
+  CommandItem,
+  CommandList 
+} from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { v4 as uuidv4 } from 'uuid';
 import countryTimezone from 'country-timezone';
@@ -154,31 +162,32 @@ const TimeRestrictionForm = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0 z-50">
+            <PopoverContent className="w-[400px] p-0">
               <Command>
                 <CommandInput placeholder="Search country..." />
                 <CommandEmpty>No country found.</CommandEmpty>
-                <CommandGroup className="max-h-[300px] overflow-y-auto">
-                  {countries.map((country) => (
-                    <CommandItem
-                      key={country.code}
-                      value={country.name}
-                      onSelect={() => {
-                        setFormData({ ...formData, country: country.code });
-                        setCountryOpen(false);
-                      }}
-                      className="flex items-center"
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          formData.country === country.code ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {country.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                <CommandList>
+                  <CommandGroup>
+                    {countries.map((country) => (
+                      <CommandItem
+                        key={country.code}
+                        value={country.name}
+                        onSelect={() => {
+                          setFormData({ ...formData, country: country.code });
+                          setCountryOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            formData.country === country.code ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {country.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
               </Command>
             </PopoverContent>
           </Popover>
@@ -210,31 +219,32 @@ const TimeRestrictionForm = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0 z-50">
+            <PopoverContent className="w-full p-0">
               <Command>
                 <CommandInput placeholder="Search timezone..." />
                 <CommandEmpty>No timezone found.</CommandEmpty>
-                <CommandGroup className="max-h-[300px] overflow-y-auto">
-                  {timezones.map((timezone) => (
-                    <CommandItem
-                      key={timezone.code}
-                      value={timezone.name}
-                      onSelect={() => {
-                        setFormData({ ...formData, timezone: timezone.code });
-                        setTimezonesOpen(false);
-                      }}
-                      className="flex items-center"
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          formData.timezone === timezone.code ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      {timezone.name}
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
+                <CommandList>
+                  <CommandGroup>
+                    {timezones.map((timezone) => (
+                      <CommandItem
+                        key={timezone.code}
+                        value={timezone.name}
+                        onSelect={() => {
+                          setFormData({ ...formData, timezone: timezone.code });
+                          setTimezonesOpen(false);
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            formData.timezone === timezone.code ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {timezone.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
               </Command>
             </PopoverContent>
           </Popover>
