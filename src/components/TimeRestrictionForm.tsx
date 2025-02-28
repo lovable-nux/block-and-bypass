@@ -49,7 +49,7 @@ const TimeRestrictionForm = ({
     startTime: restriction?.startTime || "09:00",
     endTime: restriction?.endTime || "18:00",
     days: restriction?.days || ["mon", "tue", "wed", "thu", "fri"],
-    timezone: restriction?.timezone || "Europe/Amsterdam",
+    timezone: restriction?.timezone || "",
     enabled: restriction?.enabled !== undefined ? restriction.enabled : true
   });
   
@@ -87,10 +87,18 @@ const TimeRestrictionForm = ({
           
           if (regionTimezone) {
             setFormData(prev => ({ ...prev, timezone: regionTimezone.code }));
+          } else {
+            // If no match for region, set UTC as default
+            const utcTimezone = timezones.find(tz => tz.code === "UTC");
+            if (utcTimezone) {
+              setFormData(prev => ({ ...prev, timezone: utcTimezone.code }));
+            }
           }
-          // If no match, keep the current timezone
         }
       }
+    } else {
+      // If country is cleared, also clear the timezone
+      setFormData(prev => ({ ...prev, timezone: "" }));
     }
   }, [formData.country]);
   
@@ -108,6 +116,12 @@ const TimeRestrictionForm = ({
     // Validate that a country is selected
     if (!formData.country) {
       alert("Please select a country before saving");
+      return;
+    }
+    
+    // Validate that a timezone is selected
+    if (!formData.timezone) {
+      alert("Please select a timezone before saving");
       return;
     }
     
@@ -132,7 +146,7 @@ const TimeRestrictionForm = ({
               type="time"
               id="startTime"
               value={formData.startTime}
-              onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
               className="w-full"
             />
           </div>
@@ -143,7 +157,7 @@ const TimeRestrictionForm = ({
               type="time"
               id="endTime"
               value={formData.endTime}
-              onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
               className="w-full"
             />
           </div>
@@ -198,7 +212,7 @@ const TimeRestrictionForm = ({
             <div className="flex items-center bg-accent text-accent-foreground px-3 py-1.5 rounded-md text-sm w-fit mt-2">
               {selectedCountry.name}
               <button
-                onClick={() => setFormData(prev => ({ ...prev, country: "" }))}
+                onClick={() => setFormData(prev => ({ ...prev, country: "", timezone: "" }))}
                 className="ml-2 text-accent-foreground/70 hover:text-accent-foreground"
               >
                 <X size={14} />
@@ -216,6 +230,7 @@ const TimeRestrictionForm = ({
                 role="combobox"
                 aria-expanded={timezonesOpen}
                 className="w-full justify-between"
+                disabled={!formData.country}
               >
                 {selectedTimezone ? selectedTimezone.name : "Select timezone..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -277,7 +292,7 @@ const TimeRestrictionForm = ({
           <Switch
             id="enabled"
             checked={formData.enabled}
-            onCheckedChange={(checked) => setFormData({ ...formData, enabled: checked })}
+            onCheckedChange={(checked) => setFormData(prev => ({ ...prev, enabled: checked }))}
           />
           <Label htmlFor="enabled">Enable this restriction</Label>
         </div>
