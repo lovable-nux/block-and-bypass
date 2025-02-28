@@ -4,7 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { AffiliateException } from "@/utils/types";
-import { Globe, Clock, Settings, Users } from "lucide-react";
+import { Globe, Clock, Settings, Users, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
+import { countries } from "@/utils/countries";
 
 interface AffiliateExceptionsListProps {
   affiliateExceptions: AffiliateException[];
@@ -19,6 +21,80 @@ const AffiliateExceptionsList = ({
   onToggleStatus,
   onAddFirstException
 }: AffiliateExceptionsListProps) => {
+  // State to track which affiliates have expanded country lists
+  const [expandedCountriesMap, setExpandedCountriesMap] = useState<Record<string, boolean>>({});
+
+  // Toggle expanded state for an affiliate's countries
+  const toggleCountriesExpanded = (affiliateId: string) => {
+    setExpandedCountriesMap(prev => ({
+      ...prev,
+      [affiliateId]: !prev[affiliateId]
+    }));
+  };
+
+  // Get country name from country code
+  const getCountryName = (code: string) => {
+    const country = countries.find(c => c.code === code);
+    return country ? country.name : code;
+  };
+
+  // Function to render countries section
+  const renderCountriesSection = (affiliate: AffiliateException) => {
+    // If no countries are selected, it applies globally
+    if (!affiliate.countries || affiliate.countries.length === 0) {
+      return (
+        <div className="mt-2">
+          <Badge variant="outline" className="flex items-center gap-1 bg-primary/10">
+            <Globe className="h-3 w-3" />
+            Applies globally
+          </Badge>
+        </div>
+      );
+    }
+
+    const isExpanded = expandedCountriesMap[affiliate.id];
+    const countriesToShow = isExpanded ? affiliate.countries : affiliate.countries.slice(0, 3);
+    const hasMore = affiliate.countries.length > 3;
+
+    return (
+      <div className="mt-2">
+        <div className="text-sm text-muted-foreground mb-1">Applies in:</div>
+        <div className="flex flex-wrap gap-1">
+          {countriesToShow.map(countryCode => (
+            <Badge 
+              key={countryCode} 
+              variant="outline" 
+              className="bg-secondary/10"
+            >
+              {getCountryName(countryCode)}
+            </Badge>
+          ))}
+          
+          {hasMore && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="h-6 px-2 text-xs" 
+              onClick={() => toggleCountriesExpanded(affiliate.id)}
+            >
+              {isExpanded ? (
+                <>
+                  <ChevronUp className="h-3 w-3 mr-1" />
+                  Show less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-3 w-3 mr-1" />
+                  +{affiliate.countries.length - 3} more
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (!affiliateExceptions || affiliateExceptions.length === 0) {
     return (
       <Card className="mb-6">
@@ -94,6 +170,9 @@ const AffiliateExceptionsList = ({
                   Bypass time restrictions: {affiliate.bypassRestrictions.timeRestrictions ? "Yes" : "No"}
                 </span>
               </div>
+              
+              {/* Countries section */}
+              {renderCountriesSection(affiliate)}
             </div>
           </CardContent>
         </Card>
