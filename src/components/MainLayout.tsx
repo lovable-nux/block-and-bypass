@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CountryBlocking from "@/pages/CountryBlocking";
 import TimeRestrictions from "@/pages/TimeRestrictions";
@@ -10,10 +10,11 @@ import { Globe, Clock, Users } from "lucide-react";
 
 const MainLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname.split("/").pop() || "";
   
   const handleTabChange = (value: string) => {
-    window.history.pushState({}, "", `/admin/${value}`);
+    navigate(`/admin/${value}`);
   };
 
   return (
