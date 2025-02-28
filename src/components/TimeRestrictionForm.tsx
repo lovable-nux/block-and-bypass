@@ -128,6 +128,32 @@ const TimeRestrictionForm = ({
     onSave(formData);
   };
   
+  // Improved handling of country selection
+  const handleCountrySelect = (value: string) => {
+    // Find the country object that matches the selected value (by name)
+    const selectedCountry = countries.find(country => 
+      country.name.toLowerCase() === value.toLowerCase()
+    );
+    
+    if (selectedCountry) {
+      setFormData(prev => ({ ...prev, country: selectedCountry.code }));
+      setCountryOpen(false);
+    }
+  };
+  
+  // Improved handling of timezone selection
+  const handleTimezoneSelect = (value: string) => {
+    // Find the timezone object that matches the selected value (by name)
+    const selectedTimezone = timezones.find(timezone => 
+      timezone.name.toLowerCase() === value.toLowerCase()
+    );
+    
+    if (selectedTimezone) {
+      setFormData(prev => ({ ...prev, timezone: selectedTimezone.code }));
+      setTimezonesOpen(false);
+    }
+  };
+  
   // Find the country object for the selected country code
   const selectedCountry = formData.country ? countries.find(c => c.code === formData.country) : null;
   const selectedTimezone = formData.timezone ? timezones.find(tz => tz.code === formData.timezone) : null;
@@ -177,20 +203,17 @@ const TimeRestrictionForm = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[400px] p-0">
+            <PopoverContent className="w-[400px] p-0" align="start">
               <Command>
                 <CommandInput placeholder="Search country..." />
-                <CommandList>
+                <CommandList className="max-h-[300px]">
                   <CommandEmpty>No country found.</CommandEmpty>
                   <CommandGroup>
                     {countries.map((country) => (
                       <CommandItem
                         key={country.code}
                         value={country.name}
-                        onSelect={() => {
-                          setFormData(prev => ({ ...prev, country: country.code }));
-                          setCountryOpen(false);
-                        }}
+                        onSelect={handleCountrySelect}
                         className="cursor-pointer"
                       >
                         <Check
@@ -236,20 +259,17 @@ const TimeRestrictionForm = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0">
+            <PopoverContent className="w-full p-0" align="start">
               <Command>
                 <CommandInput placeholder="Search timezone..." />
-                <CommandList>
+                <CommandList className="max-h-[300px]">
                   <CommandEmpty>No timezone found.</CommandEmpty>
                   <CommandGroup>
                     {timezones.map((timezone) => (
                       <CommandItem
                         key={timezone.code}
                         value={timezone.name}
-                        onSelect={() => {
-                          setFormData(prev => ({ ...prev, timezone: timezone.code }));
-                          setTimezonesOpen(false);
-                        }}
+                        onSelect={handleTimezoneSelect}
                         className="cursor-pointer"
                       >
                         <Check
