@@ -28,6 +28,7 @@ export interface AffiliateException {
     timeRestrictions: boolean;
   };
   enabled: boolean;
+  countries: string[]; // Array of country codes where this exception applies (empty means global)
 }
 
 export interface Language {

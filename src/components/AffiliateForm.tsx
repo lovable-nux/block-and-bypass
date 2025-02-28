@@ -1,5 +1,4 @@
-
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { 
   Card, 
   CardContent, 
@@ -12,10 +11,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { AffiliateException, AffiliateIdentifier } from "@/utils/types";
-import { Plus, Trash2, X } from "lucide-react";
+import { Plus, Trash2, X, Check, ChevronsUpDown, Globe } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from "@/hooks/use-toast";
+import { countries } from "@/utils/countries";
+import { Badge } from "@/components/ui/badge";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface AffiliateFormProps {
   affiliate?: AffiliateException;
@@ -41,11 +55,13 @@ const AffiliateForm = ({
       geoBlocking: true,
       timeRestrictions: true
     },
-    enabled: affiliate?.enabled !== undefined ? affiliate.enabled : true
+    enabled: affiliate?.enabled !== undefined ? affiliate.enabled : true,
+    countries: affiliate?.countries || []
   });
   
   const [inputValue, setInputValue] = useState("");
   const [inputError, setInputError] = useState<string | null>(null);
+  const [countrySearchOpen, setCountrySearchOpen] = useState(false);
   
   const validateInput = (value: string): { valid: boolean; type?: "id" | "email" } => {
     // Check if it's an email
@@ -132,6 +148,51 @@ const AffiliateForm = ({
     
     onSave(formData);
   };
+
+  const handleCountrySelect = (countryCode: string) => {
+    // If already selected, remove it, otherwise add it
+    if (formData.countries.includes(countryCode)) {
+      setFormData(prev => ({
+        ...prev, 
+        countries: prev.countries.filter(code => code !== countryCode)
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        countries: [...prev.countries, countryCode]
+      }));
+    }
+  };
+
+  const toggleAllCountries = () => {
+    // If we have countries selected, clear them (global mode)
+    // Otherwise, add all countries
+    if (formData.countries.length > 0) {
+      setFormData(prev => ({
+        ...prev,
+        countries: []
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        countries: countries.map(country => country.code)
+      }));
+    }
+  };
+
+  const removeCountry = (countryCode: string) => {
+    setFormData(prev => ({
+      ...prev,
+      countries: prev.countries.filter(code => code !== countryCode)
+    }));
+  };
+
+  const selectedCountries = useMemo(() => {
+    return formData.countries.map(code => {
+      const country = countries.find(c => c.code === code);
+      return country ? country.name : code;
+    });
+  }, [formData.countries]);
   
   return (
     <Card className="w-full animate-fade-in">
@@ -191,6 +252,90 @@ const AffiliateForm = ({
               ))}
             </div>
           )}
+        </div>
+
+        <div className="space-y-3">
+          <Label>Countries Where Exception Applies</Label>
+          
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={toggleAllCountries}
+                size="sm"
+              >
+                <Globe size={16} className="mr-2" />
+                {formData.countries.length === 0 ? "Global (All Countries)" : "Clear Countries"}
+              </Button>
+              
+              <Popover open={countrySearchOpen} onOpenChange={setCountrySearchOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={countrySearchOpen}
+                    size="sm"
+                  >
+                    Select Countries
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[300px] p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search countries..." />
+                    <CommandList className="max-h-[300px]">
+                      <CommandEmpty>No country found.</CommandEmpty>
+                      <CommandGroup>
+                        {countries.map((country) => (
+                          <CommandItem
+                            key={country.code}
+                            value={country.name}
+                            onSelect={() => handleCountrySelect(country.code)}
+                            className="cursor-pointer"
+                          >
+                            <Check
+                              className={`mr-2 h-4 w-4 ${
+                                formData.countries.includes(country.code)
+                                  ? "opacity-100"
+                                  : "opacity-0"
+                              }`}
+                            />
+                            {country.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            {formData.countries.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                This exception applies to all countries (global)
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.countries.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData.countries.map(countryCode => {
+                      const country = countries.find(c => c.code === countryCode);
+                      return (
+                        <Badge key={countryCode} variant="secondary" className="flex items-center gap-1">
+                          {country?.name || countryCode}
+                          <X 
+                            size={14} 
+                            className="cursor-pointer opacity-70 hover:opacity-100"
+                            onClick={() => removeCountry(countryCode)}
+                          />
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         
         <div className="space-y-3 pt-2">

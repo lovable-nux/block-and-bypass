@@ -17,6 +17,15 @@ export const useAffiliateExceptions = () => {
     const loadSettings = async () => {
       try {
         const data = await fetchSettings();
+        
+        // Initialize countries field for each affiliate exception if it doesn't exist
+        if (data.affiliateExceptions) {
+          data.affiliateExceptions = data.affiliateExceptions.map(affiliate => ({
+            ...affiliate,
+            countries: affiliate.countries || []
+          }));
+        }
+        
         setSettings(data);
       } catch (error) {
         toast({
@@ -121,12 +130,13 @@ export const useAffiliateExceptions = () => {
     setIsAdding(true);
     setActiveAffiliate({
       id: uuidv4(),
-      identifiers: [{ value: "", type: "id" }],
+      identifiers: [],
       bypassRestrictions: {
         geoBlocking: true,
         timeRestrictions: true
       },
-      enabled: true
+      enabled: true,
+      countries: [] // Empty array means global (all countries)
     });
   };
 
