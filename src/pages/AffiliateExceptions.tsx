@@ -222,7 +222,7 @@ const AffiliateExceptions = () => {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>About affiliate exceptions</AlertTitle>
                 <AlertDescription>
-                  Exceptions allow specific affiliates to bypass the country blocking and time restrictions. They are identified by their affiliate ID or email.
+                  Admins can allow specific affiliate players to bypass country blocking and time restrictions. Players are identified by the affiliate ID in the query parameter during registration. If assigned to an approved affiliate, they can log in even when restrictions apply.
                 </AlertDescription>
               </Alert>
               
