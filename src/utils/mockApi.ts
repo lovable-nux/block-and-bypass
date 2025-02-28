@@ -24,7 +24,8 @@ const initialSettings: GeoBlockingSettings = {
         geoBlocking: true,
         timeRestrictions: true
       },
-      enabled: true
+      enabled: true,
+      countries: [] // Adding the missing countries property (empty array means global)
     }
   ],
   blockMessages: languages.map(lang => ({
@@ -68,6 +69,14 @@ const getStoredSettings = (): GeoBlockingSettings => {
       // Make sure affiliateExceptions is initialized
       if (!parsedSettings.affiliateExceptions) {
         parsedSettings.affiliateExceptions = initialSettings.affiliateExceptions;
+      }
+      
+      // Ensure all affiliate exceptions have a countries array
+      if (parsedSettings.affiliateExceptions) {
+        parsedSettings.affiliateExceptions = parsedSettings.affiliateExceptions.map((exception: any) => ({
+          ...exception,
+          countries: exception.countries || []
+        }));
       }
       
       return parsedSettings;
