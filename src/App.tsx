@@ -10,7 +10,7 @@ function App() {
     <>
       <Router>
         <Routes>
-          <Route path="/" element={<Navigate to="/admin" replace />} />
+          <Route path="/" element={<Navigate to="/admin/country-blocking" replace />} />
           <Route path="/admin/*" element={<MainLayout />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
