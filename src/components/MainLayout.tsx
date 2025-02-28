@@ -32,7 +32,8 @@ const MainLayout = () => {
         </div>
         
         <Tabs 
-          value={currentPath || "country-blocking"} 
+          defaultValue="country-blocking"
+          value={currentPath} 
           onValueChange={handleTabChange}
           className="w-full"
         >
@@ -63,7 +64,7 @@ const MainLayout = () => {
         
         <div className="mt-6">
           <Routes>
-            <Route path="/" element={<Navigate to="country-blocking" replace />} />
+            <Route path="/" element={<Navigate to="/admin/country-blocking" replace />} />
             <Route path="country-blocking" element={<CountryBlocking />} />
             <Route path="time-restrictions" element={<TimeRestrictions />} />
             <Route path="affiliate-exceptions" element={<AffiliateExceptions />} />
