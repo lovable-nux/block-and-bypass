@@ -158,29 +158,27 @@ const TimeRestrictionForm = ({
               <Command>
                 <CommandInput placeholder="Search country..." />
                 <CommandEmpty>No country found.</CommandEmpty>
-                <div className="max-h-[300px] overflow-y-auto">
-                  <CommandGroup>
-                    {countries.map((country) => (
-                      <CommandItem
-                        key={country.code}
-                        value={country.name}
-                        onSelect={() => {
-                          setFormData({ ...formData, country: country.code });
-                          setCountryOpen(false);
-                        }}
-                        className="flex items-center"
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            formData.country === country.code ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {country.name}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </div>
+                <CommandGroup className="max-h-[300px] overflow-y-auto">
+                  {countries.map((country) => (
+                    <CommandItem
+                      key={country.code}
+                      value={country.name}
+                      onSelect={() => {
+                        setFormData({ ...formData, country: country.code });
+                        setCountryOpen(false);
+                      }}
+                      className="flex items-center"
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          formData.country === country.code ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {country.name}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
               </Command>
             </PopoverContent>
           </Popover>
@@ -212,15 +210,15 @@ const TimeRestrictionForm = ({
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-full p-0 max-h-[300px] overflow-y-auto z-50">
+            <PopoverContent className="w-full p-0 z-50">
               <Command>
                 <CommandInput placeholder="Search timezone..." />
                 <CommandEmpty>No timezone found.</CommandEmpty>
-                <CommandGroup>
+                <CommandGroup className="max-h-[300px] overflow-y-auto">
                   {timezones.map((timezone) => (
                     <CommandItem
                       key={timezone.code}
-                      value={timezone.code}
+                      value={timezone.name}
                       onSelect={() => {
                         setFormData({ ...formData, timezone: timezone.code });
                         setTimezonesOpen(false);
