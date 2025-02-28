@@ -1,98 +1,86 @@
 
-import { Routes, Route, Link, useLocation } from 'react-router-dom'
-import { 
-  Globe, 
-  Clock, 
-  Settings as SettingsIcon,
-  Users,
-  Home
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
-import Header from '@/components/Header'
-import CountryBlocking from '@/pages/CountryBlocking'
-import TimeRestrictions from '@/pages/TimeRestrictions'
-import Settings from '@/pages/Settings'
-import NotFound from '@/pages/NotFound'
-import AffiliateExceptions from '@/pages/AffiliateExceptions'
-
-const navItems = [
-  {
-    title: 'Country Blocking',
-    href: '/admin/country-blocking',
-    icon: Globe
-  },
-  {
-    title: 'Time Restrictions',
-    href: '/admin/time-restrictions',
-    icon: Clock
-  },
-  {
-    title: 'Affiliate Exceptions',
-    href: '/admin/affiliate-exceptions',
-    icon: Users
-  },
-  {
-    title: 'Settings',
-    href: '/admin/settings',
-    icon: SettingsIcon
-  }
-]
+import { useState } from "react";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import CountryBlocking from "@/pages/CountryBlocking";
+import TimeRestrictions from "@/pages/TimeRestrictions";
+import AffiliateExceptions from "@/pages/AffiliateExceptions";
+import Header from "@/components/Header";
+import { Globe, Clock, Users } from "lucide-react";
 
 const MainLayout = () => {
-  const location = useLocation()
+  const location = useLocation();
+  const navigate = useNavigate();
+  const currentPath = location.pathname.split("/").pop() || "";
   
+  const handleTabChange = (value: string) => {
+    navigate(`/admin/${value}`);
+  };
+
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen bg-background">
       <Header />
       
-      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_1fr] md:gap-6 lg:grid-cols-[240px_1fr] lg:gap-10 py-8">
-        <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 overflow-y-auto border-r md:sticky md:block">
-          <div className="py-6 pr-6 lg:py-8">
-            <div className="mb-4">
-              <Link 
-                to="/admin"
-                className={cn(
-                  "flex items-center gap-2 py-2.5 px-3 text-sm font-medium rounded-md",
-                  location.pathname === '/admin' ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                )}
-              >
-                <Home className="h-4 w-4" />
-                Dashboard
-              </Link>
-            </div>
-            <nav className="grid items-start gap-1">
-              {navItems.map((item, index) => (
-                <Link
-                  key={index}
-                  to={item.href}
-                  className={cn(
-                    "flex items-center gap-2 py-2.5 px-3 text-sm font-medium rounded-md",
-                    location.pathname === item.href 
-                      ? "bg-accent text-accent-foreground" 
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  )}
-                >
-                  {item.icon && <item.icon className="h-4 w-4" />}
-                  {item.title}
-                </Link>
-              ))}
-            </nav>
+      <main className="container px-4 py-6 pt-20 animate-fade-in">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">GeoAccess Manager</h1>
+            <p className="text-muted-foreground mt-1">
+              Manage access restrictions for your platform
+            </p>
           </div>
-        </aside>
+        </div>
         
-        <main className="flex w-full flex-col overflow-hidden">
+        <Tabs 
+          defaultValue="country-blocking"
+          value={currentPath} 
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
+          <TabsList className="w-full justify-start mb-6 border-b pb-0 rounded-none bg-background">
+            <TabsTrigger 
+              value="country-blocking"
+              className="flex items-center gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none pb-3"
+            >
+              <Globe size={18} />
+              Country Blocking
+            </TabsTrigger>
+            <TabsTrigger 
+              value="time-restrictions"
+              className="flex items-center gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none pb-3"
+            >
+              <Clock size={18} />
+              Time Restrictions
+            </TabsTrigger>
+            <TabsTrigger 
+              value="affiliate-exceptions"
+              className="flex items-center gap-2 data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none pb-3"
+            >
+              <Users size={18} />
+              Affiliate Exceptions
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
+        <div className="mt-6">
           <Routes>
-            <Route path="/" element={<CountryBlocking />} />
+            <Route path="/" element={<Navigate to="/admin/country-blocking" replace />} />
             <Route path="/country-blocking" element={<CountryBlocking />} />
             <Route path="/time-restrictions" element={<TimeRestrictions />} />
             <Route path="/affiliate-exceptions" element={<AffiliateExceptions />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<NotFound />} />
           </Routes>
-        </main>
+        </div>
+      </main>
+      
+      <div className="container pb-8">
+        <div className="p-4 rounded-lg bg-sidebar-accent/50 border border-sidebar-border text-center">
+          <p className="text-xs text-sidebar-foreground/80">
+            GeoAccess Manager v1.0
+          </p>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MainLayout
+export default MainLayout;
