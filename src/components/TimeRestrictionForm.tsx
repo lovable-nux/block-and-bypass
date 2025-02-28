@@ -116,6 +116,7 @@ const TimeRestrictionForm = ({
   
   // Find the country object for the selected country code
   const selectedCountry = formData.country ? countries.find(c => c.code === formData.country) : null;
+  const selectedTimezone = formData.timezone ? timezones.find(tz => tz.code === formData.timezone) : null;
   
   return (
     <Card className="w-full animate-fade-in">
@@ -165,17 +166,18 @@ const TimeRestrictionForm = ({
             <PopoverContent className="w-[400px] p-0">
               <Command>
                 <CommandInput placeholder="Search country..." />
-                <CommandEmpty>No country found.</CommandEmpty>
                 <CommandList>
+                  <CommandEmpty>No country found.</CommandEmpty>
                   <CommandGroup>
                     {countries.map((country) => (
                       <CommandItem
                         key={country.code}
                         value={country.name}
                         onSelect={() => {
-                          setFormData({ ...formData, country: country.code });
+                          setFormData(prev => ({ ...prev, country: country.code }));
                           setCountryOpen(false);
                         }}
+                        className="cursor-pointer"
                       >
                         <Check
                           className={cn(
@@ -215,24 +217,25 @@ const TimeRestrictionForm = ({
                 aria-expanded={timezonesOpen}
                 className="w-full justify-between"
               >
-                {formData.timezone ? timezones.find(tz => tz.code === formData.timezone)?.name : "Select timezone..."}
+                {selectedTimezone ? selectedTimezone.name : "Select timezone..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-full p-0">
               <Command>
                 <CommandInput placeholder="Search timezone..." />
-                <CommandEmpty>No timezone found.</CommandEmpty>
                 <CommandList>
+                  <CommandEmpty>No timezone found.</CommandEmpty>
                   <CommandGroup>
                     {timezones.map((timezone) => (
                       <CommandItem
                         key={timezone.code}
                         value={timezone.name}
                         onSelect={() => {
-                          setFormData({ ...formData, timezone: timezone.code });
+                          setFormData(prev => ({ ...prev, timezone: timezone.code }));
                           setTimezonesOpen(false);
                         }}
+                        className="cursor-pointer"
                       >
                         <Check
                           className={cn(
