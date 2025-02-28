@@ -19,8 +19,7 @@ const initialSettings: GeoBlockingSettings = {
   affiliateExceptions: [
     {
       id: "1",
-      name: "Premium Affiliate",
-      affiliateId: "PREMIUM001",
+      identifiers: [{ value: "PREMIUM001", type: "id" }],
       bypassRestrictions: {
         geoBlocking: true,
         timeRestrictions: true

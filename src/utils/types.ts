@@ -15,10 +15,14 @@ export interface TimeRestriction {
   enabled: boolean;
 }
 
+export interface AffiliateIdentifier {
+  value: string;
+  type: "id" | "email";
+}
+
 export interface AffiliateException {
   id: string;
-  name: string;
-  affiliateId: string;
+  identifiers: AffiliateIdentifier[];
   bypassRestrictions: {
     geoBlocking: boolean;
     timeRestrictions: boolean;

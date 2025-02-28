@@ -3,9 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { 
   Globe, 
   Clock, 
-  Users, 
-  Settings, 
-  Home,
+  Users,
   ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -18,11 +16,9 @@ const Sidebar = () => {
   };
 
   const menuItems = [
-    { path: "/", icon: <Home size={20} />, label: "Dashboard" },
     { path: "/country-blocking", icon: <Globe size={20} />, label: "Country Blocking" },
     { path: "/time-restrictions", icon: <Clock size={20} />, label: "Time Restrictions" },
     { path: "/affiliate-exceptions", icon: <Users size={20} />, label: "Affiliate Exceptions" },
-    { path: "/settings", icon: <Settings size={20} />, label: "Settings" }
   ];
 
   return (

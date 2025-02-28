@@ -142,6 +142,16 @@ const AffiliateExceptions = () => {
       </div>
     );
   }
+
+  const formatIdentifiers = (identifiers: AffiliateException['identifiers']) => {
+    if (identifiers.length === 0) return "No identifiers";
+    
+    if (identifiers.length === 1) {
+      return identifiers[0].value;
+    }
+    
+    return `${identifiers[0].value} +${identifiers.length - 1} more`;
+  };
   
   return (
     <div className="flex min-h-screen bg-background">
@@ -164,8 +174,7 @@ const AffiliateExceptions = () => {
                 setIsAdding(true);
                 setActiveAffiliate({
                   id: uuidv4(),
-                  name: "",
-                  affiliateId: "",
+                  identifiers: [],
                   bypassRestrictions: {
                     geoBlocking: true,
                     timeRestrictions: true
@@ -203,8 +212,7 @@ const AffiliateExceptions = () => {
                       setIsAdding(true);
                       setActiveAffiliate({
                         id: uuidv4(),
-                        name: "",
-                        affiliateId: "",
+                        identifiers: [],
                         bypassRestrictions: {
                           geoBlocking: true,
                           timeRestrictions: true
@@ -223,7 +231,7 @@ const AffiliateExceptions = () => {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>How affiliate exceptions work</AlertTitle>
                     <AlertDescription>
-                      Users accessing your site through affiliate links with the specified IDs will be allowed to register and log in even from blocked countries or during restricted times. This helps ensure your affiliate campaigns run smoothly regardless of geo-blocking rules.
+                      Users accessing your site through affiliate links with the specified IDs or emails will be allowed to register and log in even from blocked countries or during restricted times. This helps ensure your affiliate campaigns run smoothly regardless of geo-blocking rules.
                     </AlertDescription>
                   </Alert>
                   
@@ -234,16 +242,21 @@ const AffiliateExceptions = () => {
                           <div className="space-y-1">
                             <CardTitle className="flex items-center text-lg">
                               <Users className="mr-2 h-5 w-5 text-primary" />
-                              {affiliate.name || "Unnamed Affiliate"}
                               <Badge 
                                 variant={affiliate.enabled ? "default" : "outline"} 
-                                className="ml-3"
+                                className="ml-1"
                               >
                                 {affiliate.enabled ? "Active" : "Inactive"}
                               </Badge>
                             </CardTitle>
                             <CardDescription>
-                              Affiliate ID: <span className="font-mono">{affiliate.affiliateId}</span>
+                              {affiliate.identifiers.map((id, index) => (
+                                <span key={index} className="mr-1">
+                                  <Badge variant="outline" className="mr-1 font-mono">
+                                    {id.value}
+                                  </Badge>
+                                </span>
+                              ))}
                             </CardDescription>
                           </div>
                           <div className="flex items-center space-x-2">
@@ -290,7 +303,7 @@ const AffiliateExceptions = () => {
                         
                         <div className="mt-4 bg-muted/50 p-3 rounded-md text-sm">
                           <p className="text-muted-foreground">
-                            Traffic with affiliate ID <span className="font-mono">{affiliate.affiliateId}</span> will be allowed to access your site 
+                            Traffic from these identifiers will be allowed to access your site 
                             {affiliate.bypassRestrictions.geoBlocking && affiliate.bypassRestrictions.timeRestrictions 
                               ? " regardless of their location or time of day." 
                               : affiliate.bypassRestrictions.geoBlocking 
