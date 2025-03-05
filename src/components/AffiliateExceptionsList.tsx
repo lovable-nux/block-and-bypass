@@ -117,7 +117,7 @@ const AffiliateExceptionsList = ({
       {affiliateExceptions.map((affiliate) => (
         <Card key={affiliate.id} className="card-hover overflow-hidden">
           <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between">
               <div className="space-y-1">
                 <CardTitle className="flex items-center text-lg">
                   <Users className="mr-2 h-5 w-5 text-primary" />
@@ -130,16 +130,16 @@ const AffiliateExceptionsList = ({
                   </Badge>
                 </CardTitle>
                 <CardDescription>
-                  {affiliate.identifiers && affiliate.identifiers.map((id, index) => (
-                    <span key={index} className="mr-1">
-                      <Badge variant="outline" className="mr-1 font-mono">
+                  <div className="flex flex-wrap gap-1">
+                    {affiliate.identifiers && affiliate.identifiers.map((id, index) => (
+                      <Badge key={index} variant="outline" className="font-mono">
                         {id.value}
                       </Badge>
-                    </span>
-                  ))}
+                    ))}
+                  </div>
                 </CardDescription>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 mt-3 sm:mt-0">
                 <Switch
                   checked={affiliate.enabled}
                   onCheckedChange={(checked) => onToggleStatus(affiliate.id, checked)}
@@ -149,6 +149,7 @@ const AffiliateExceptionsList = ({
                   variant="outline" 
                   size="sm"
                   onClick={() => onEditAffiliate(affiliate)}
+                  className="whitespace-nowrap"
                 >
                   <Settings className="h-4 w-4 mr-1" />
                   Edit
@@ -159,13 +160,13 @@ const AffiliateExceptionsList = ({
           <CardContent className="pt-0">
             <div className="flex flex-col gap-2 mt-2">
               <div className="flex items-center">
-                <Globe className="h-4 w-4 text-muted-foreground mr-2" />
+                <Globe className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0" />
                 <span className="text-sm text-muted-foreground">
                   Bypass geo-blocking: {affiliate.bypassRestrictions.geoBlocking ? "Yes" : "No"}
                 </span>
               </div>
               <div className="flex items-center">
-                <Clock className="h-4 w-4 text-muted-foreground mr-2" />
+                <Clock className="h-4 w-4 text-muted-foreground mr-2 flex-shrink-0" />
                 <span className="text-sm text-muted-foreground">
                   Bypass time restrictions: {affiliate.bypassRestrictions.timeRestrictions ? "Yes" : "No"}
                 </span>
